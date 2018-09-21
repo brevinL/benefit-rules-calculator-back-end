@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  web:
+    image: neo-and-nde-benefit-calculator-back-end
+    depends_on:
+      - mysql
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+    networks:
+      - webnet
+networks:
+  webnet:

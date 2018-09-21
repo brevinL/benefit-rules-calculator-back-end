@@ -1,0 +1,553 @@
+[
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 1,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 2,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 3,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 4,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 5,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 6,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 7,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 8,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 9,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 10,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 11,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 12,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 13,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 14,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 15,
+		"fields": {
+			"money": 41,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 1
+		}
+	},
+
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 16,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 17,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 18,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 19,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 20,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 21,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 22,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 23,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 24,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 25,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 26,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 27,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 28,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 29,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 30,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 31,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 32,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 33,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 34,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+		{
+		"model": "BenefitRule.Earning",
+		"pk": 35,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 36,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 37,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 38,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 39,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 40,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 41,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 42,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 43,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 44,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 45,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 46,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 47,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 48,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 49,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 50,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 51,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 52,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 53,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 54,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	},
+	{
+		"model": "BenefitRule.Earning",
+		"pk": 55,
+		"fields": {
+			"money": 43,
+			"type_of_earning": "C",
+			"time_period": "Y",
+			"person": 2
+		}
+	}
+]

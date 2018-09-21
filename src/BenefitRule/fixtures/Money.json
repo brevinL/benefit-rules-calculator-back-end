@@ -1,0 +1,303 @@
+[
+	{
+		"model": "BenefitRule.Money",
+		"pk": 1,
+		"fields": {
+			"amount": 45481
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 2,
+		"fields": {
+			"amount": 45623
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 3,
+		"fields": {
+			"amount": 45768
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 4,
+		"fields": {
+			"amount": 45912
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 5,
+		"fields": {
+			"amount": 46053
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 6,
+		"fields": {
+			"amount": 46196
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 7,
+		"fields": {
+			"amount": 46342
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 8,
+		"fields": {
+			"amount": 46484
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 9,
+		"fields": {
+			"amount": 46629
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 10,
+		"fields": {
+			"amount": 46772
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 11,
+		"fields": {
+			"amount": 46914
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 12,
+		"fields": {
+			"amount": 47058
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 13,
+		"fields": {
+			"amount": 47201
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 14,
+		"fields": {
+			"amount": 47345
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 15,
+		"fields": {
+			"amount": 47488
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 16,
+		"fields": {
+			"amount": 47631
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 17,
+		"fields": {
+			"amount": 47775
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 18,
+		"fields": {
+			"amount": 47918
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 19,
+		"fields": {
+			"amount": 48062
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 20,
+		"fields": {
+			"amount": 48206
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 21,
+		"fields": {
+			"amount": 48350
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 22,
+		"fields": {
+			"amount": 48492
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 23,
+		"fields": {
+			"amount": 48636
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 24,
+		"fields": {
+			"amount": 48780
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 25,
+		"fields": {
+			"amount": 48923
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 26,
+		"fields": {
+			"amount": 49066
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 27,
+		"fields": {
+			"amount": 49209
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 28,
+		"fields": {
+			"amount": 49353
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 29,
+		"fields": {
+			"amount": 49496
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 30,
+		"fields": {
+			"amount": 49640
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 31,
+		"fields": {
+			"amount": 49784
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 32,
+		"fields": {
+			"amount": 49927
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 33,
+		"fields": {
+			"amount": 50070
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 34,
+		"fields": {
+			"amount": 50213
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 35,
+		"fields": {
+			"amount": 50357
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 36,
+		"fields": {
+			"amount": 50500
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 37,
+		"fields": {
+			"amount": 50644
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 38,
+		"fields": {
+			"amount": 50787
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 39,
+		"fields": {
+			"amount": 50931
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 40,
+		"fields": {
+			"amount": 50931
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 41,
+		"fields": {
+			"amount": 30000
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 42,
+		"fields": {
+			"amount": 40000
+		}
+	},
+	{
+		"model": "BenefitRule.Money",
+		"pk": 43,
+		"fields": {
+			"amount": 50000
+		}
+	}
+]

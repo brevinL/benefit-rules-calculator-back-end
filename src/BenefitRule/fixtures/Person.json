@@ -1,0 +1,16 @@
+[
+	{
+		"model": "BenefitRule.Person",
+		"pk": 1,
+		"fields": {
+			"year_of_birth": 1954
+		}
+	},
+	{
+		"model": "BenefitRule.Person",
+		"pk": 2,
+		"fields": {
+			"year_of_birth": 1954
+		}
+	}
+]

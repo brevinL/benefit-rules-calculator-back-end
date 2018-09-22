@@ -3,20 +3,20 @@ import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'BenefitCalculator.settings')
 django.setup()
-from BenefitRule.models import Relationship
-from NEOandNDEBenefitCalculator.models import Money, Respondent
+from BenefitRule.models import Relationship, Money
+from NEOandNDEBenefitCalculator.models import Respondent
 from rest_framework.reverse import reverse
 
 # Start execution here!
 if __name__ == '__main__':
 	print("Starting Respondent & Record population script...")
 
-	m1 = Money.objects.get_or_create(amount=30000.00)
+	m1 = Money.objects.create(amount=30000.00)
 	m2 = Money.objects.create(amount=40000.00)
 	m3 = Money.objects.create(amount=50000.00)
 	m4 = Money.objects.create(amount=0.00)
 
-	beneficary, created = Respondent.objects.get_or_create(
+	beneficary = Respondent.objects.create(
 		year_of_birth=1954,
 		years_of_covered_earnings=15,
 		annual_covered_earning=m1,
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 		spousal_early_retirement_reduction=0.00,
 		survivor_early_retirement_reduction=0.00)
 
-	spouse, created = Respondent.objects.get_or_create(
+	spouse = Respondent.objects.create(
 		year_of_birth=1954,
 		years_of_covered_earnings=40,
 		annual_covered_earning=m3,

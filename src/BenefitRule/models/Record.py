@@ -33,23 +33,33 @@ class Record(models.Model):
 		unique_together = ('content_type', 'object_id')
 
 	def calculate_earliest_retirement_age(self, earliest_retirement_age_law, year_of_birth):
+		if year_of_birth is None:
+			return None
 		earliest_retirement_age = earliest_retirement_age_law.calculate(year_of_birth=year_of_birth)
 		return earliest_retirement_age
 
 	def calculate_normal_retirement_age(self, normal_retirement_age_law, year_of_birth):
+		if year_of_birth is None:
+			return None
 		normal_retirement_age = normal_retirement_age_law.calculate(year_of_birth=year_of_birth)
 		return normal_retirement_age
 
 	def calculate_annual_covered_earnings(self, earnings):
+		if earnings is None:
+			return None
 		annual_covered_earnings = earnings.filter(type_of_earning=Earning.COVERED, time_period=Earning.YEARLY)
 		return annual_covered_earnings
 
 	def calculate_average_indexed_monthly_covered_earning(self, aime_law, taxable_earnings):
+		if taxable_earnings is None:
+			return None
 		average_indexed_monthly_covered_earning = aime_law.calculate(taxable_earnings=taxable_earnings) 
 		average_indexed_monthly_covered_earning.save()
 		return average_indexed_monthly_covered_earning
 
 	def calculate_basic_primary_insurance_amount(self, pia_law, average_indexed_monthly_earning, year_of_coverage=0):
+		if average_indexed_monthly_earning is None or year_of_coverage is None:
+			return None
 		basic_primary_insurance_amount = pia_law.calculate(
 			average_indexed_monthly_earning=average_indexed_monthly_earning, 
 			year_of_coverage=year_of_coverage)
@@ -57,6 +67,8 @@ class Record(models.Model):
 		return basic_primary_insurance_amount
 
 	def calculate_wep_primary_insurance_amount(self, wep_pia_law, average_indexed_monthly_earning, year_of_coverage):
+		if average_indexed_monthly_earning is None or year_of_coverage is None:
+			return None
 		wep_primary_insurance_amount = wep_pia_law.calculate(
 			average_indexed_monthly_earning=average_indexed_monthly_earning,
 			year_of_coverage=year_of_coverage)
@@ -64,20 +76,28 @@ class Record(models.Model):
 		return wep_primary_insurance_amount
 
 	def calculate_annual_non_covered_earnings(self, earnings):
+		if earnings is None:
+			return None
 		annual_non_covered_earnings = earnings.filter(type_of_earning=Earning.NONCOVERED, time_period=Earning.YEARLY)
 		return annual_non_covered_earnings
 
 	def calculate_average_indexed_monthly_non_covered_earning(self, aime_law, taxable_earnings):
+		if taxable_earnings is None:
+			return None
 		average_indexed_monthly_non_covered_earning = aime_law.calculate(taxable_earnings=taxable_earnings) 
 		average_indexed_monthly_non_covered_earning.save()
 		return average_indexed_monthly_non_covered_earning
 
 	def calculate_government_pension_offset(self, gpo_law, monthly_non_covered_pension):
+		if monthly_non_covered_pension is None:
+			return None
 		government_pension_offset = gpo_law.calculate(monthly_non_covered_pension=monthly_non_covered_pension)
 		government_pension_offset.save()
 		return government_pension_offset
 
 	def calculate_wep_reduction(self, wep_law, primary_insurance_amount, wep_primary_insurance_amount, monthly_non_covered_pension):
+		if primary_insurance_amount is None or wep_primary_insurance_amount is None or monthly_non_covered_pension is None:
+			return None
 		wep_reduction = wep_law.calculate(
 			primary_insurance_amount=primary_insurance_amount, 
 			wep_primary_insurance_amount=wep_primary_insurance_amount,
@@ -86,11 +106,15 @@ class Record(models.Model):
 		return wep_reduction
 
 	def calculate_final_primary_insurance_amount(self, basic_primary_insurance_amount, wep_reduction):
+		if basic_primary_insurance_amount is None or wep_reduction is None:
+			return None
 		final_primary_insurance_amount = basic_primary_insurance_amount - wep_reduction
 		final_primary_insurance_amount.save()
 		return final_primary_insurance_amount
 
 	def calculate_max_delay_retirement_credit(self, drc_law, year_of_birth, normal_retirement_age):
+		if year_of_birth is None or normal_retirement_age is None:
+			return None
 		max_delay_retirement_credit = drc_law.calculate(
 			year_of_birth=year_of_birth, 
 			normal_retirement_age=normal_retirement_age, 
@@ -98,6 +122,8 @@ class Record(models.Model):
 		return max_delay_retirement_credit
 
 	def calculate_delay_retirement_credit(self, drc_law, year_of_birth, normal_retirement_age, retirement_age, max_delay_retirement_credit):
+		if year_of_birth is None or normal_retirement_age is None or retirement_age is None or max_delay_retirement_credit is None:
+			return None
 		delay_retirement_credit = drc_law.calculate(
 			year_of_birth=year_of_birth,
 			normal_retirement_age=normal_retirement_age,
@@ -106,12 +132,16 @@ class Record(models.Model):
 		return delay_retirement_credit
 
 	def calculate_max_early_retirement_reduction(self, primary_err_law, normal_retirement_age, earliest_retirement_age):
+		if normal_retirement_age is None or earliest_retirement_age is None:
+			return None
 		max_early_retirement_reduction = primary_err_law.calculate(
 			normal_retirement_age=normal_retirement_age, 
 			early_retirement_age=earliest_retirement_age)
 		return max_early_retirement_reduction
 
 	def calculate_early_retirement_reduction(self, primary_err_law, normal_retirement_age, retirement_age, max_early_retirement_reduction):
+		if normal_retirement_age is None or retirement_age is None or max_early_retirement_reduction is None:
+			return None
 		early_retirement_reduction = primary_err_law.calculate(
 			normal_retirement_age=normal_retirement_age, 
 			early_retirement_age=retirement_age)
@@ -119,6 +149,8 @@ class Record(models.Model):
 		return early_retirement_reduction
 
 	def calculate_benefit(self, final_primary_insurance_amount, delay_retirement_credit, early_retirement_reduction):
+		if final_primary_insurance_amount is None or delay_retirement_credit is None or early_retirement_reduction is None:
+			return None
 		benefit = final_primary_insurance_amount * (1 + (delay_retirement_credit - early_retirement_reduction))
 		benefit.save()
 		return benefit

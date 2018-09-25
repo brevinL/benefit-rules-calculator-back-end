@@ -1,5 +1,5 @@
 from datetime import date
-from django.db.models import Q
+from django.db.models import Q, Max
 from rest_framework import status, viewsets, serializers
 from rest_framework.decorators import action 
 from rest_framework.response import Response
@@ -10,7 +10,6 @@ from django.contrib.contenttypes.models import ContentType
 
 # fix to able to post only
 # redudant code just to reference a overrided record and detail record managers
-# get instance of record to calculate records/benefits instead of managers
 class PersonViewSet(viewsets.ModelViewSet):
 	queryset = Person.objects.all()
 	serializer_class = PersonSerializer
@@ -20,11 +19,10 @@ class PersonViewSet(viewsets.ModelViewSet):
 
 	@action(methods=['post'], detail=True)
 	def get_updated_record(self, request, pk=None): # given an inital record -> applied benefit rules to record -> update record
-		# have to change manually each year because you got to 
-		# add in the numbers for the other laws to db anyways
-		year = 2016
+		start_date = BenefitRule.objects.aggregate(Max('start_date')).get('start_date__max') 
+		end_date = BenefitRule.objects.aggregate(Max('end_date')).get('end_date__max')
 		try:
-			benefit_rules = BenefitRule.objects.get(start_date__lte=date(year, 1, 1), end_date__gte=date(year, 12, 31))
+			benefit_rules = BenefitRule.objects.get(start_date__lte=start_date, end_date__gte=end_date)
 		except BenefitRule.DoesNotExist:
 			return Response({'detail': 'No Benefit Rules match the given query'}, content_type='application/json;charset=utf-8', status=status.HTTP_404_NOT_FOUND)
 
@@ -66,11 +64,12 @@ class PersonViewSet(viewsets.ModelViewSet):
 		record_serializer = RecordSerializer(record, context={'request': request})
 		return Response(record_serializer.data, content_type='application/json;charset=utf-8', status=status.HTTP_200_OK)
 
-	@action(methods=['get'], detail=True)
+	@action(methods=['post'], detail=True)
 	def get_updated_detail_record(self, request, pk=None):
-		year = 2016
+		start_date = BenefitRule.objects.aggregate(Max('start_date')).get('start_date__max') 
+		end_date = BenefitRule.objects.aggregate(Max('end_date')).get('end_date__max')
 		try:
-			benefit_rules = BenefitRule.objects.get(start_date__lte=date(year, 1, 1), end_date__gte=date(year, 12, 31))
+			benefit_rules = BenefitRule.objects.get(start_date__lte=start_date, end_date__gte=end_date)
 		except BenefitRule.DoesNotExist:
 			return Response({'detail': 'No Benefit Rules match the given query'}, content_type='application/json;charset=utf-8', status=status.HTTP_404_NOT_FOUND)
 

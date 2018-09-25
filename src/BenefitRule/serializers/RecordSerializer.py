@@ -32,3 +32,8 @@ class RecordSerializer(serializers.ModelSerializer):
 			'wep_primary_insurance_amount', 'average_indexed_monthly_non_covered_earning', 
 			'monthly_non_covered_pension', 'wep_reduction', 'final_primary_insurance_amount',
 			'benefit', 'government_pension_offset', 'spousal_insurance_benefit', 'survivor_insurance_benefit')
+
+class RecordConfigSerializer(serializers.Serializer):
+	partial_update = serializers.BooleanField()
+	non_covered_earning_available = serializers.BooleanField()
+	covered_earning_available = serializers.BooleanField()

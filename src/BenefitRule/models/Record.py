@@ -4,6 +4,16 @@ from .Earning import Earning
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
+class RecordConfig(object):
+	partial_update = False
+	non_covered_earning_available = True
+	covered_earning_available = True
+
+	def __init__(self, obj={}):
+		self.partial_update = obj.get('partial_update', self.partial_update)
+		self.non_covered_earning_available = obj.get('non_covered_earning_available', self.non_covered_earning_available)
+		self.covered_earning_available = obj.get('covered_earning_available', self.covered_earning_available)
+
 class Record(models.Model):
 	limit = {'model__in': ['person', 'respondent']}
 	
@@ -28,6 +38,8 @@ class Record(models.Model):
 	government_pension_offset = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="government_pension_offset")
 	spousal_insurance_benefit = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="spousal_insurance_benefit") 
 	survivor_insurance_benefit = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="survivor_insurance_benefit") 
+
+	config = RecordConfig()
 
 	class Meta:
 		unique_together = ('content_type', 'object_id')
@@ -155,147 +167,169 @@ class Record(models.Model):
 		benefit.save()
 		return benefit
 
-	def calculate_retirement_record(self, benefit_rules):
-		earliest_retirement_age = self.calculate_earliest_retirement_age(
-			earliest_retirement_age_law=benefit_rules.earliest_retirement_age_law,
-			year_of_birth=self.content_object.year_of_birth)
-		normal_retirement_age = self.calculate_normal_retirement_age(
-			normal_retirement_age_law=benefit_rules.normal_retirement_age_law,
-			year_of_birth=self.content_object.year_of_birth)
-		annual_covered_earnings = self.calculate_annual_covered_earnings(earnings=self.content_object.earning_set)
-		average_indexed_monthly_covered_earning = self.calculate_average_indexed_monthly_covered_earning(
-			aime_law=benefit_rules.aime_law,
-			taxable_earnings=annual_covered_earnings) 
-		basic_primary_insurance_amount = self.calculate_basic_primary_insurance_amount(
-			pia_law=benefit_rules.pia_law,
-			average_indexed_monthly_earning=average_indexed_monthly_covered_earning)
-		wep_primary_insurance_amount = self.calculate_wep_primary_insurance_amount(
-			wep_pia_law=benefit_rules.wep_pia_law, 
-			average_indexed_monthly_earning=average_indexed_monthly_covered_earning,
-			year_of_coverage=annual_covered_earnings.count())
-		annual_non_covered_earnings = self.calculate_annual_non_covered_earnings(earnings=self.content_object.earning_set)
-		average_indexed_monthly_non_covered_earning = self.calculate_average_indexed_monthly_non_covered_earning(
-			aime_law=benefit_rules.aime_law, 
-			taxable_earnings=annual_non_covered_earnings)
-		# monthly_non_covered_pension = average_indexed_monthly_non_covered_earning * respondent.fraction_of_non_covered_aime_to_non_covered_pension
-		government_pension_offset = self.calculate_government_pension_offset(
-			gpo_law=benefit_rules.gpo_law, 
-			monthly_non_covered_pension=monthly_non_covered_pension)
-		wep_reduction = self.calculate_wep_reduction(
-			wep_law=benefit_rules.wep_law, 
-			primary_insurance_amount=basic_primary_insurance_amount, 
-			wep_primary_insurance_amount=wep_primary_insurance_amount, 
-			monthly_non_covered_pension=monthly_non_covered_pension)
-		final_primary_insurance_amount = self.calculate_final_primary_insurance_amount(
-			basic_primary_insurance_amount=basic_primary_insurance_amount, 
-			wep_reduction=wep_reduction)
-		max_delay_retirement_credit = self.calculate_max_delay_retirement_credit(
-			drc_law=benefit_rules.drc_law, 
-			year_of_birth=self.content_object.year_of_birth, 
-			normal_retirement_age=normal_retirement_age)
-		delay_retirement_credit = self.calculate_delay_retirement_credit(
-			drc_law=benefit_rules.drc_law, 
-			year_of_birth=self.content_object.year_of_birth, 
-			normal_retirement_age=normal_retirement_age, 
-			retirement_age=self.content_object.retirement_age,
-			max_delay_retirement_credit=max_delay_retirement_credit)
-		max_early_retirement_reduction = self.calculate_max_early_retirement_reduction(
-			primary_err_law=benefit_rules.primary_err_law, 
-			normal_retirement_age=normal_retirement_age, 
-			earliest_retirement_age=earliest_retirement_age)
-		early_retirement_reduction = self.calculate_early_retirement_reduction(
-			primary_err_law=benefit_rules.primary_err_law, 
-			normal_retirement_age=normal_retirement_age, 
-			retirement_age=self.content_object.retirement_age, 
-			max_early_retirement_reduction=max_early_retirement_reduction)
-		benefit = self.calculate_benefit(
-			final_primary_insurance_amount=final_primary_insurance_amount, 
-			delay_retirement_credit=delay_retirement_credit, 
-			early_retirement_reduction=early_retirement_reduction)
+	def calculate_retirement_record(self, benefit_rules, config=None):
+		config = self.config if config is None else config
 
-		return self.update_record(
-			earliest_retirement_age=earliest_retirement_age,
-			normal_retirement_age=normal_retirement_age,
-			average_indexed_monthly_covered_earning=average_indexed_monthly_covered_earning,
-			basic_primary_insurance_amount=basic_primary_insurance_amount,
-			wep_primary_insurance_amount=wep_primary_insurance_amount,
-			average_indexed_monthly_non_covered_earning=average_indexed_monthly_non_covered_earning,
-			monthly_non_covered_pension=monthly_non_covered_pension,
-			government_pension_offset=government_pension_offset,
-			wep_reduction=wep_reduction,
-			final_primary_insurance_amount=final_primary_insurance_amount,
-			max_delay_retirement_credit=max_delay_retirement_credit,
-			delay_retirement_credit=delay_retirement_credit,
-			max_early_retirement_reduction=max_early_retirement_reduction,
-			early_retirement_reduction=early_retirement_reduction,
-			benefit=benefit)
+		if self.earliest_retirement_age is None or not config.partial_update:
+			self.earliest_retirement_age = self.calculate_earliest_retirement_age(
+				earliest_retirement_age_law=benefit_rules.earliest_retirement_age_law,
+				year_of_birth=self.content_object.year_of_birth)
 
-	def update_record(self,
-		earliest_retirement_age=None,
-		normal_retirement_age=None,
-		average_indexed_monthly_covered_earning=None,
-		basic_primary_insurance_amount=None,
-		wep_primary_insurance_amount=None,
-		average_indexed_monthly_non_covered_earning=None,
-		monthly_non_covered_pension=None,
-		government_pension_offset=None,
-		wep_reduction=None,
-		final_primary_insurance_amount=None,
-		max_delay_retirement_credit=None,
-		delay_retirement_credit=None,
-		max_early_retirement_reduction=None,
-		early_retirement_reduction=None,
-		benefit=None):
-		if not earliest_retirement_age is None:
-			self.earliest_retirement_age = earliest_retirement_age
-		if not normal_retirement_age is None:
-			self.normal_retirement_age = normal_retirement_age
-		if not average_indexed_monthly_covered_earning is None:
-			self.average_indexed_monthly_covered_earning = average_indexed_monthly_covered_earning
-		if not basic_primary_insurance_amount is None:
-			self.basic_primary_insurance_amount = basic_primary_insurance_amount
-		if not wep_primary_insurance_amount is None:
-			self.wep_primary_insurance_amount = wep_primary_insurance_amount
-		if not average_indexed_monthly_non_covered_earning is None:
-			self.average_indexed_monthly_non_covered_earning = average_indexed_monthly_non_covered_earning
-		if not monthly_non_covered_pension is None:
-			self.monthly_non_covered_pension = monthly_non_covered_pension
-		if not government_pension_offset is None:
-			self.government_pension_offset = government_pension_offset
-		if not wep_reduction is None:
-			self.wep_reduction = wep_reduction
-		if not final_primary_insurance_amount is None:
-			self.final_primary_insurance_amount = final_primary_insurance_amount
-		if not max_delay_retirement_credit is None:
-			self.max_delay_retirement_credit = max_delay_retirement_credit
-		if not delay_retirement_credit is None:
-			self.delay_retirement_credit = delay_retirement_credit
-		if not max_early_retirement_reduction is None:
-			self.max_early_retirement_reduction = max_early_retirement_reduction
-		if not early_retirement_reduction is None:
-			self.early_retirement_reduction = early_retirement_reduction
-		if not benefit is None:
-			self.benefit = benefit
+		if self.normal_retirement_age is None or not config.partial_update:
+			self.normal_retirement_age = self.calculate_normal_retirement_age(
+				normal_retirement_age_law=benefit_rules.normal_retirement_age_law,
+				year_of_birth=self.content_object.year_of_birth)
+
+		if config.covered_earning_available:
+			annual_covered_earnings = self.calculate_annual_covered_earnings(earnings=self.content_object.earnings)
+		else:
+			annual_covered_earnings = None
+
+		if self.average_indexed_monthly_covered_earning is None or not config.partial_update: 
+			self.average_indexed_monthly_covered_earning = self.calculate_average_indexed_monthly_covered_earning(
+				aime_law=benefit_rules.aime_law,
+				taxable_earnings=annual_covered_earnings) 
+
+		if self.basic_primary_insurance_amount is None or not config.partial_update:
+			self.basic_primary_insurance_amount = self.calculate_basic_primary_insurance_amount(
+				pia_law=benefit_rules.pia_law,
+				average_indexed_monthly_earning=self.average_indexed_monthly_covered_earning)
+
+		if annual_covered_earnings is None or not config.partial_update:
+			years_of_annual_covered_earnings = None
+		else:
+			years_of_annual_covered_earnings = annual_covered_earnings.count()
+
+		if self.wep_primary_insurance_amount is None or not config.partial_update:
+			self.wep_primary_insurance_amount = self.calculate_wep_primary_insurance_amount(
+				wep_pia_law=benefit_rules.wep_pia_law, 
+				average_indexed_monthly_earning=self.average_indexed_monthly_covered_earning,
+				year_of_coverage=years_of_annual_covered_earnings)
+
+		if config.non_covered_earning_available:
+			annual_non_covered_earnings = self.calculate_annual_non_covered_earnings(earnings=self.content_object.earnings)
+		else:
+			annual_non_covered_earnings = None
+
+		if self.average_indexed_monthly_non_covered_earning is None or not config.partial_update:
+			self.average_indexed_monthly_non_covered_earning = self.calculate_average_indexed_monthly_non_covered_earning(
+				aime_law=benefit_rules.aime_law, 
+				taxable_earnings=annual_non_covered_earnings)
+
+		if self.monthly_non_covered_pension is None or not config.partial_update:
+			pass
+
+		if self.government_pension_offset is None or not config.partial_update:
+			self.government_pension_offset = self.calculate_government_pension_offset(
+				gpo_law=benefit_rules.gpo_law, 
+				monthly_non_covered_pension=self.monthly_non_covered_pension)
+
+		if self.wep_reduction is None or not config.partial_update:
+			self.wep_reduction = self.calculate_wep_reduction(
+				wep_law=benefit_rules.wep_law, 
+				primary_insurance_amount=self.basic_primary_insurance_amount, 
+				wep_primary_insurance_amount=self.wep_primary_insurance_amount, 
+				monthly_non_covered_pension=self.monthly_non_covered_pension)
+
+		if self.final_primary_insurance_amount is None or not config.partial_update:
+			self.final_primary_insurance_amount = self.calculate_final_primary_insurance_amount(
+				basic_primary_insurance_amount=self.basic_primary_insurance_amount, 
+				wep_reduction=self.wep_reduction) # break out wep reduction from pia
+
+		if self.max_delay_retirement_credit is None or not config.partial_update:
+			self.max_delay_retirement_credit = self.calculate_max_delay_retirement_credit(
+				drc_law=benefit_rules.drc_law, 
+				year_of_birth=self.content_object.year_of_birth, 
+				normal_retirement_age=self.normal_retirement_age)
+
+		if self.delay_retirement_credit is None or not config.partial_update:
+			self.delay_retirement_credit = self.calculate_delay_retirement_credit(
+				drc_law=benefit_rules.drc_law, 
+				year_of_birth=self.content_object.year_of_birth, 
+				normal_retirement_age=self.normal_retirement_age, 
+				retirement_age=self.content_object.retirement_age,
+				max_delay_retirement_credit=self.max_delay_retirement_credit)
+
+		if self.max_early_retirement_reduction is None or not config.partial_update:
+			self.max_early_retirement_reduction = self.calculate_max_early_retirement_reduction(
+				primary_err_law=benefit_rules.primary_err_law, 
+				normal_retirement_age=self.normal_retirement_age, 
+				earliest_retirement_age=self.earliest_retirement_age)
+
+		if self.early_retirement_reduction is None or not config.partial_update:
+			self.early_retirement_reduction = self.calculate_early_retirement_reduction(
+				primary_err_law=benefit_rules.primary_err_law, 
+				normal_retirement_age=self.normal_retirement_age, 
+				retirement_age=self.content_object.retirement_age, 
+				max_early_retirement_reduction=self.max_early_retirement_reduction)
+
+		if self.benefit is None or not config.partial_update:
+			self.benefit = self.calculate_benefit(
+				final_primary_insurance_amount=self.final_primary_insurance_amount, 
+				delay_retirement_credit=self.delay_retirement_credit, 
+				early_retirement_reduction=self.early_retirement_reduction) # break out drc and err from pia
+
 		self.save()
 		return self
 
-	def calculate_dependent_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record):
-		beneficiary_record.spousal_insurance_benefit = benefit_rules.spousal_insurance_benefit_law.calculate(
-			primary_insurance_amount=beneficiary_record.basic_primary_insurance_amount, 
-			spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount,
-			government_pension_offset=beneficiary_record.government_pension_offset)
-		beneficiary_record.spousal_insurance_benefit.save()
-		return beneficiary_record
+	def calculate_spousal_insurance_benefit(self, spousal_insurance_benefit_law, primary_insurance_amount, spousal_primary_insurance_amount, government_pension_offset):
+		if primary_insurance_amount is None or spousal_primary_insurance_amount is None or government_pension_offset is None:
+			return None
+		spousal_insurance_benefit = spousal_insurance_benefit_law.calculate(
+			primary_insurance_amount=primary_insurance_amount, 
+			spousal_primary_insurance_amount=spousal_primary_insurance_amount,
+			government_pension_offset=government_pension_offset)
+		spousal_insurance_benefit.save()
+		return spousal_insurance_benefit
 
-	def calculate_survivor_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record):
-		survivor_early_retirement_reduction = benefit_rules.survivor_insurance_benefit_law.calculateSurvivorEarlyRetirementReductionFactor(
-			normal_retirement_age=beneficiary_record.normal_retirement_age,
+	def calculate_dependent_benefits(self, benefit_rules, spousal_beneficiary_record, config=None):
+		config = self.config if config is None else config
+
+		if self.spousal_insurance_benefit is None or not config.partial_update:
+			self.spousal_insurance_benefit = self.calculate_spousal_insurance_benefit(
+				spousal_insurance_benefit_law=benefit_rules.spousal_insurance_benefit_law,
+				primary_insurance_amount=self.basic_primary_insurance_amount,
+				spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount,
+				government_pension_offset=self.government_pension_offset)
+		self.save()
+		return self
+
+	def calculate_survivor_early_retirement_reduction(self, survivor_insurance_benefit_law, normal_retirement_age, retirement_age):
+		if normal_retirement_age is None or retirement_age is None:
+			return None
+		survivor_early_retirement_reduction = survivor_insurance_benefit_law.calculateSurvivorEarlyRetirementReductionFactor(
+			normal_retirement_age=normal_retirement_age,
 			retirement_age=self.content_object.retirement_age)
-		beneficiary_record.survivor_insurance_benefit = benefit_rules.survivor_insurance_benefit_law.calculate(
-			primary_insurance_amount=beneficiary_record.benefit, 
-			deceased_spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount, 
-			survivor_early_retirement_reduction_factor=survivor_early_retirement_reduction, 
-			spousal_delay_retirement_factor=spousal_beneficiary_record.delay_retirement_credit,
-			government_pension_offset=beneficiary_record.government_pension_offset)
-		beneficiary_record.survivor_insurance_benefit.save()
-		return beneficiary_record
+		return survivor_early_retirement_reduction
+
+	def calculate_survivor_insurance_benefit(self, survivor_insurance_benefit_law, primary_insurance_amount, deceased_spousal_primary_insurance_amount, 
+		survivor_early_retirement_reduction_factor, spousal_delay_retirement_factor, government_pension_offset):
+		if primary_insurance_amount is None or deceased_spousal_primary_insurance_amount is None or survivor_early_retirement_reduction_factor is None or \
+			spousal_delay_retirement_factor is None or government_pension_offset is None:
+			return None
+		survivor_insurance_benefit = survivor_insurance_benefit_law.calculate(
+			primary_insurance_amount=primary_insurance_amount, 
+			deceased_spousal_primary_insurance_amount=deceased_spousal_primary_insurance_amount, 
+			survivor_early_retirement_reduction_factor=survivor_early_retirement_reduction_factor, 
+			spousal_delay_retirement_factor=spousal_delay_retirement_factor,
+			government_pension_offset=government_pension_offset)
+		survivor_insurance_benefit.save()
+		return survivor_insurance_benefit
+
+	def calculate_survivor_benefits(self, benefit_rules, spousal_beneficiary_record, config=None):
+		config = self.config if config is None else config
+
+		if self.survivor_insurance_benefit is None or not config.partial_update:
+			survivor_early_retirement_reduction = self.calculate_survivor_early_retirement_reduction(
+				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,
+				normal_retirement_age=self.normal_retirement_age,
+				retirement_age=self.content_object.retirement_age)
+			self.survivor_insurance_benefit = self.calculate_survivor_insurance_benefit(
+				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,
+				primary_insurance_amount=self.benefit, 
+				deceased_spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount, 
+				survivor_early_retirement_reduction_factor=survivor_early_retirement_reduction, 
+				spousal_delay_retirement_factor=spousal_beneficiary_record.delay_retirement_credit,
+				government_pension_offset=self.government_pension_offset)
+		self.save()
+		return self

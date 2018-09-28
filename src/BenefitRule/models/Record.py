@@ -37,6 +37,7 @@ class Record(models.Model):
 	benefit = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="benefit") 
 	government_pension_offset = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="government_pension_offset")
 	spousal_insurance_benefit = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="spousal_insurance_benefit") 
+	survivor_early_retirement_reduction = models.FloatField(null=True)
 	survivor_insurance_benefit = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="survivor_insurance_benefit") 
 
 	config = RecordConfig()
@@ -291,7 +292,7 @@ class Record(models.Model):
 				primary_insurance_amount=self.basic_primary_insurance_amount,
 				spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount,
 				government_pension_offset=self.government_pension_offset)
-		self.save()
+			self.save()
 		return self
 
 	def calculate_survivor_early_retirement_reduction(self, survivor_insurance_benefit_law, normal_retirement_age, retirement_age):
@@ -320,7 +321,7 @@ class Record(models.Model):
 		config = self.config if config is None else config
 
 		if self.survivor_insurance_benefit is None or not config.partial_update:
-			survivor_early_retirement_reduction = self.calculate_survivor_early_retirement_reduction(
+			self.survivor_early_retirement_reduction = self.calculate_survivor_early_retirement_reduction(
 				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,
 				normal_retirement_age=self.normal_retirement_age,
 				retirement_age=self.content_object.retirement_age)
@@ -328,8 +329,8 @@ class Record(models.Model):
 				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,
 				primary_insurance_amount=self.benefit, 
 				deceased_spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount, 
-				survivor_early_retirement_reduction_factor=survivor_early_retirement_reduction, 
+				survivor_early_retirement_reduction_factor=self.survivor_early_retirement_reduction, 
 				spousal_delay_retirement_factor=spousal_beneficiary_record.delay_retirement_credit,
 				government_pension_offset=self.government_pension_offset)
-		self.save()
+			self.save()
 		return self

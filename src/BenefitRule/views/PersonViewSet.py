@@ -8,7 +8,6 @@ from BenefitRule.serializers import RecordSerializer, DetailRecordSerializer, Pe
 from NEOandNDEBenefitCalculator.models import Respondent
 from django.contrib.contenttypes.models import ContentType
 
-# fix to able to post only
 # redudant code just to reference a overrided record and detail record managers
 class PersonViewSet(viewsets.ModelViewSet):
 	queryset = Person.objects.all()
@@ -111,11 +110,11 @@ class PersonViewSet(viewsets.ModelViewSet):
 
 			spouse_detail_record = spouse_detail_record.calculate_retirement_record(benefit_rules=benefit_rules, beneficiary_record=record)
 
-			detail_record = detail_record.calculate_dependent_benefits(benefit_rules=benefit_rules, beneficiary_record=record, spousal_beneficiary_record=spouse_record, detail_record=detail_record)
-			detail_record = detail_record.calculate_survivor_benefits(benefit_rules=benefit_rules, beneficiary_record=record, spousal_beneficiary_record=spouse_record, detail_record=detail_record)
+			detail_record = detail_record.calculate_dependent_benefits(benefit_rules=benefit_rules, beneficiary_record=record, spousal_beneficiary_record=spouse_record)
+			detail_record = detail_record.calculate_survivor_benefits(benefit_rules=benefit_rules, beneficiary_record=record, spousal_beneficiary_record=spouse_record)
 
-			spouse_detail_record = spouse_detail_record.calculate_dependent_benefits(benefit_rules=benefit_rules, beneficiary_record=spouse_record, spousal_beneficiary_record=record, detail_record=spouse_detail_record)
-			spouse_detail_record = spouse_detail_record.calculate_survivor_benefits(benefit_rules=benefit_rules, beneficiary_record=spouse_record, spousal_beneficiary_record=record, detail_record=spouse_detail_record)
+			spouse_detail_record = spouse_detail_record.calculate_dependent_benefits(benefit_rules=benefit_rules, beneficiary_record=spouse_record, spousal_beneficiary_record=record)
+			spouse_detail_record = spouse_detail_record.calculate_survivor_benefits(benefit_rules=benefit_rules, beneficiary_record=spouse_record, spousal_beneficiary_record=record)
 
 		detail_record_serializer = DetailRecordSerializer(instance=detail_record, context={'request': request})
 		return Response(detail_record_serializer.data, content_type='application/json;charset=utf-8', status=status.HTTP_200_OK)

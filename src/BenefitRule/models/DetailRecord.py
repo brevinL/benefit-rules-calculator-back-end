@@ -227,40 +227,45 @@ class DetailRecord(models.Model):
 	def calculate_spousal_insurance_benefit(self, spousal_insurance_benefit_law, primary_insurance_amount, spousal_primary_insurance_amount, government_pension_offset):
 		if primary_insurance_amount is None or spousal_primary_insurance_amount is None or government_pension_offset is None:
 			return None
-		spousal_insurance_benefit = spousal_insurance_benefit_law.calculate(
+		spousal_insurance_benefit_task = spousal_insurance_benefit_law.stepByStep(
 			primary_insurance_amount=primary_insurance_amount, 
 			spousal_primary_insurance_amount=spousal_primary_insurance_amount,
 			government_pension_offset=government_pension_offset)
-		spousal_insurance_benefit.save()
-		return spousal_insurance_benefit
-
-	def calculate_dependent_benefits(self, benefit_rules, spousal_beneficiary_record, config=None):
-		config = self.config if config is None else config
-
-		if self.spousal_insurance_benefit is None or not config.partial_update:
-			self.spousal_insurance_benefit = self.calculate_spousal_insurance_benefit(
-				spousal_insurance_benefit_law=benefit_rules.spousal_insurance_benefit_law,
-				primary_insurance_amount=self.basic_primary_insurance_amount,
-				spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount,
-				government_pension_offset=self.government_pension_offset)
-		self.save()
-		return self
+		spousal_insurance_benefit_task.save()
+		return spousal_insurance_benefit_task
 		
-	# def calculate_dependent_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record, detail_record):
+	def calculate_dependent_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record):
+		if self.spousal_insurance_benefit_task is None or not config.partial_update:
+			self.spousal_insurance_benefit_task = self.calculate_spousal_insurance_benefit(
+				spousal_insurance_benefit_law=benefit_rules.spousal_insurance_benefit_law,
+				primary_insurance_amount=beneficiary_record.basic_primary_insurance_amount, 
+				spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount,
+				government_pension_offset=beneficiary_record.government_pension_offset)
+			self.save()
+		return self
 
-	# 	detail_record.spousal_insurance_benefit_task = benefit_rules.spousal_insurance_benefit_law.stepByStep(
-	# 		primary_insurance_amount=beneficiary_record.basic_primary_insurance_amount, 
-	# 		spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount,
-	# 		government_pension_offset=beneficiary_record.government_pension_offset)
-	# 	detail_record.save()
-	# 	return detail_record
+	def calculate_survivor_insurance_benefit(self, survivor_insurance_benefit_law, primary_insurance_amount, deceased_spousal_primary_insurance_amount, 
+		survivor_early_retirement_reduction_factor, spousal_delay_retirement_factor, government_pension_offset):
+		if primary_insurance_amount is None or deceased_spousal_primary_insurance_amount is None or survivor_early_retirement_reduction_factor is None or \
+			spousal_delay_retirement_factor is None or government_pension_offset is None:
+			return None
+		survivor_insurance_benefit = survivor_insurance_benefit_law.calculate(
+			primary_insurance_amount=primary_insurance_amount, 
+			deceased_spousal_primary_insurance_amount=deceased_spousal_primary_insurance_amount, 
+			survivor_early_retirement_reduction_factor=survivor_early_retirement_reduction_factor, 
+			spousal_delay_retirement_factor=spousal_delay_retirement_factor,
+			government_pension_offset=government_pension_offset)
+		survivor_insurance_benefit.save()
+		return survivor_insurance_benefit
 
-	def calculate_survivor_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record, detail_record):
-		detail_record.survivor_insurance_benefit_task = benefit_rules.survivor_insurance_benefit_law.stepByStep(
-			primary_insurance_amount=beneficiary_record.benefit, 
-			deceased_spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount, 
-			survivor_early_retirement_reduction_factor=beneficiary_record.survivor_early_retirement_reduction, #
-			spousal_delay_retirement_factor=spousal_beneficiary_record.delay_retirement_credit,
-			government_pension_offset=beneficiary_record.government_pension_offset)
-		detail_record.save()
-		return detail_record	
+	def calculate_survivor_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record):
+		if self.survivor_insurance_benefit_task is None or not config.partial_update:
+			self.survivor_insurance_benefit_task = self.calculate_survivor_insurance_benefit(
+				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,
+				primary_insurance_amount=beneficiary_record.benefit, 
+				deceased_spousal_primary_insurance_amount=spousal_beneficiary_record.basic_primary_insurance_amount, 
+				survivor_early_retirement_reduction_factor=beneficiary_record.survivor_early_retirement_reduction, 
+				spousal_delay_retirement_factor=spousal_beneficiary_record.delay_retirement_credit,
+				government_pension_offset=beneficiary_record.government_pension_offset)
+			self.save()
+		return self	

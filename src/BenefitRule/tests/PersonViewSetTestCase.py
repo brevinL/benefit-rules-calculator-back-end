@@ -111,7 +111,7 @@ class PersonViewSetTestCase(APITestCase):
 			spousal_insurance_benefit_law=spouse_insurance_benefit,
 			survivor_insurance_benefit_law=survivor_insurance_benefit) 
 
-	def test_get_updated_record(self):
+	def test_get_updated_partial_record(self):
 		beneficary = Person.objects.create(year_of_birth=1954, retirement_age=66)
 		spouse = Person.objects.create(year_of_birth=1954, retirement_age=66)
 
@@ -177,7 +177,7 @@ class PersonViewSetTestCase(APITestCase):
 		serializer = RecordSerializer(beneficiary_record, context={'request': request})
 		self.assertEqual(response.data, serializer.data)
 
-	def test_get_updated_detail_record(self):
+	def test_get_updated_detail_partial_record(self):
 		beneficary = Person.objects.create(year_of_birth=1954, retirement_age=66)
 		spouse = Person.objects.create(year_of_birth=1954, retirement_age=66)
 
@@ -197,7 +197,13 @@ class PersonViewSetTestCase(APITestCase):
 			monthly_non_covered_pension=Money.objects.create(amount=1595.00),
 			early_retirement_reduction=0.00,
 			delay_retirement_credit=0.00,
-			wep_reduction=Money.objects.create(amount=428.00))
+			wep_reduction=Money.objects.create(amount=428.00),
+
+			final_primary_insurance_amount=Money.objects.create(amount=Decimal(411.00)),
+			benefit=Money.objects.create(amount=Decimal(411.00)),
+			government_pension_offset=Money.objects.create(amount=Decimal(1063.33)),
+			spousal_insurance_benefit=Money.objects.create(amount=Decimal(0.00)),
+			survivor_insurance_benefit=Money.objects.create(amount=Decimal(354.67)))
 		beneficary_record.save()
 
 		spouse_record = Record(
@@ -222,7 +228,6 @@ class PersonViewSetTestCase(APITestCase):
 
 		response = self.client.post(url, payload, format='json')
 
-		print(response.data)
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		self.assertEqual(Record.objects.count(), 2)
 		self.assertEqual(DetailRecord.objects.count(), 2)
@@ -230,16 +235,16 @@ class PersonViewSetTestCase(APITestCase):
 		beneficiary_detail_record = DetailRecord.objects.get(
 			content_type__pk=person_type.id, 
 			object_id=beneficary.id)
-		self.assertGreaterEqual(beneficiary_detail_record.basic_primary_insurance_amount_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.monthly_non_covered_pension_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.wep_reduction_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.final_primary_insurance_amount_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.delay_retirement_credit_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.early_retirement_reduction_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.benefit_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.government_pension_offset_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.spousal_insurance_benefit_task.instructions.count(), 1)
-		self.assertGreaterEqual(beneficiary_detail_record.survivor_insurance_benefit_task.instructions.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.basic_primary_insurance_amount_task.instruction_set.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.monthly_non_covered_pension_task.instruction_set.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.wep_reduction_task.instruction_set.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.final_primary_insurance_amount_task.instruction_set.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.delay_retirement_credit_task.instruction_set.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.early_retirement_reduction_task.instruction_set.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.benefit_task.instruction_set.count(), 1)
+		self.assertGreaterEqual(beneficiary_detail_record.government_pension_offset_task.instruction_set.count(), 1)
+		self.assertGreaterEqual(beneficiary_detail_record.spousal_insurance_benefit_task.instruction_set.count(), 1)
+		# self.assertGreaterEqual(beneficiary_detail_record.survivor_insurance_benefit_task.instruction_set.count(), 1) # not implemented yet
 
 		factory = APIRequestFactory()
 		request = factory.post(url, payload, format='json')

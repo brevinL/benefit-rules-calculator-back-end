@@ -115,18 +115,16 @@ class PersonViewSetTestCase(APITestCase):
 		beneficary = Person.objects.create(year_of_birth=1954, retirement_age=66)
 		spouse = Person.objects.create(year_of_birth=1954, retirement_age=66)
 
-		person_type = ContentType.objects.get_for_model(beneficary)
-
 		relationship = Relationship(
-			content_object1=beneficary, 
-			content_object2=spouse, 
+			person1=beneficary, 
+			person2=spouse, 
 			person1_role=Relationship.BENEFICIARY,
 			person2_role=Relationship.SPOUSE,
 			relationship_type=Relationship.MARRIED)
 		relationship.save()
 
 		beneficary_record = Record(
-			content_object=beneficary,
+			person=beneficary,
 			basic_primary_insurance_amount=Money.objects.create(amount=839.00),
 			monthly_non_covered_pension=Money.objects.create(amount=1595.00),
 			early_retirement_reduction=0.00,
@@ -135,7 +133,7 @@ class PersonViewSetTestCase(APITestCase):
 		beneficary_record.save()
 
 		spouse_record = Record(
-			content_object=spouse,
+			person=spouse,
 			basic_primary_insurance_amount=Money.objects.create(amount=1829.00),
 			monthly_non_covered_pension=Money.objects.create(amount=0.00),
 			early_retirement_reduction=0.00,
@@ -158,15 +156,13 @@ class PersonViewSetTestCase(APITestCase):
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
 		self.assertEqual(Record.objects.count(), 2)
 
-		beneficiary_record = Record.objects.get(
-			content_type__pk=person_type.id, 
-			object_id=beneficary.id)
+		beneficiary_record = Record.objects.get(person=beneficary)
 		self.assertAlmostEqual(beneficiary_record.basic_primary_insurance_amount, Money(amount=Decimal(839.00)), places=2)
 		self.assertAlmostEqual(beneficiary_record.monthly_non_covered_pension, Money(amount=Decimal(1595.00)), places=2)
 		self.assertAlmostEqual(beneficiary_record.wep_reduction, Money(amount=Decimal(428.00)), places=2)
 		self.assertAlmostEqual(beneficiary_record.final_primary_insurance_amount, Money(amount=Decimal(411.00)), places=2)
-		self.assertAlmostEqual(beneficiary_record.delay_retirement_credit, 0.00, places=2)
-		self.assertAlmostEqual(beneficiary_record.early_retirement_reduction, 0.00, places=2)
+		self.assertAlmostEqual(beneficiary_record.delay_retirement_credit, 0.00, places=2) #
+		self.assertAlmostEqual(beneficiary_record.early_retirement_reduction, 0.00, places=2) #
 		self.assertAlmostEqual(beneficiary_record.benefit, Money(amount=Decimal(411.00)), places=2)
 		self.assertAlmostEqual(beneficiary_record.government_pension_offset, Money(amount=Decimal(1063.33)), places=2)
 		self.assertAlmostEqual(beneficiary_record.spousal_insurance_benefit, Money(amount=Decimal(0.00)), places=2)
@@ -181,18 +177,16 @@ class PersonViewSetTestCase(APITestCase):
 		beneficary = Person.objects.create(year_of_birth=1954, retirement_age=66)
 		spouse = Person.objects.create(year_of_birth=1954, retirement_age=66)
 
-		person_type = ContentType.objects.get_for_model(beneficary)
-
 		relationship = Relationship(
-			content_object1=beneficary, 
-			content_object2=spouse, 
+			person1=beneficary, 
+			person2=spouse, 
 			person1_role=Relationship.BENEFICIARY,
 			person2_role=Relationship.SPOUSE,
 			relationship_type=Relationship.MARRIED)
 		relationship.save()
 
 		beneficary_record = Record(
-			content_object=beneficary,
+			person=beneficary,
 			basic_primary_insurance_amount=Money.objects.create(amount=839.00),
 			monthly_non_covered_pension=Money.objects.create(amount=1595.00),
 			early_retirement_reduction=0.00,
@@ -207,7 +201,7 @@ class PersonViewSetTestCase(APITestCase):
 		beneficary_record.save()
 
 		spouse_record = Record(
-			content_object=spouse,
+			person=spouse,
 			basic_primary_insurance_amount=Money.objects.create(amount=1829.00),
 			monthly_non_covered_pension=Money.objects.create(amount=0.00),
 			early_retirement_reduction=0.00,
@@ -232,9 +226,7 @@ class PersonViewSetTestCase(APITestCase):
 		self.assertEqual(Record.objects.count(), 2)
 		self.assertEqual(DetailRecord.objects.count(), 2)
 
-		beneficiary_detail_record = DetailRecord.objects.get(
-			content_type__pk=person_type.id, 
-			object_id=beneficary.id)
+		beneficiary_detail_record = DetailRecord.objects.get(person=beneficary)
 		# self.assertGreaterEqual(beneficiary_detail_record.basic_primary_insurance_amount_task.instruction_set.count(), 1)
 		# self.assertGreaterEqual(beneficiary_detail_record.monthly_non_covered_pension_task.instruction_set.count(), 1)
 		# self.assertGreaterEqual(beneficiary_detail_record.wep_reduction_task.instruction_set.count(), 1)

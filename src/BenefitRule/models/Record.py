@@ -1,8 +1,7 @@
 from django.db import models
 from .Money import Money
 from .Earning import Earning
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from .Person import Person
 
 class RecordConfig(object):
 	partial_update = False
@@ -15,12 +14,7 @@ class RecordConfig(object):
 		self.covered_earning_available = obj.get('covered_earning_available', self.covered_earning_available)
 
 class Record(models.Model):
-	limit = {'model__in': ['person', 'respondent']}
-	
-	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to=limit)
-	object_id = models.PositiveIntegerField()
-	content_object = GenericForeignKey('content_type', 'object_id')
-
+	person = models.ForeignKey(Person, on_delete=models.CASCADE)
 	earliest_retirement_age = models.PositiveSmallIntegerField(null=True)
 	normal_retirement_age = models.PositiveSmallIntegerField(null=True)
 	average_indexed_monthly_covered_earning = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="average_indexed_monthly_covered_earning") 
@@ -41,9 +35,6 @@ class Record(models.Model):
 	survivor_insurance_benefit = models.ForeignKey(Money, on_delete=models.CASCADE, null=True, related_name="survivor_insurance_benefit") 
 
 	config = RecordConfig()
-
-	class Meta:
-		unique_together = ('content_type', 'object_id')
 
 	def calculate_earliest_retirement_age(self, earliest_retirement_age_law, year_of_birth):
 		if year_of_birth is None:
@@ -174,15 +165,15 @@ class Record(models.Model):
 		if self.earliest_retirement_age is None or not config.partial_update:
 			self.earliest_retirement_age = self.calculate_earliest_retirement_age(
 				earliest_retirement_age_law=benefit_rules.earliest_retirement_age_law,
-				year_of_birth=self.content_object.year_of_birth)
+				year_of_birth=self.person.year_of_birth)
 
 		if self.normal_retirement_age is None or not config.partial_update:
 			self.normal_retirement_age = self.calculate_normal_retirement_age(
 				normal_retirement_age_law=benefit_rules.normal_retirement_age_law,
-				year_of_birth=self.content_object.year_of_birth)
+				year_of_birth=self.person.year_of_birth)
 
 		if config.covered_earning_available:
-			annual_covered_earnings = self.calculate_annual_covered_earnings(earnings=self.content_object.earnings)
+			annual_covered_earnings = self.calculate_annual_covered_earnings(earnings=self.person.earning_set)
 		else:
 			annual_covered_earnings = None
 
@@ -208,7 +199,7 @@ class Record(models.Model):
 				year_of_coverage=years_of_annual_covered_earnings)
 
 		if config.non_covered_earning_available:
-			annual_non_covered_earnings = self.calculate_annual_non_covered_earnings(earnings=self.content_object.earnings)
+			annual_non_covered_earnings = self.calculate_annual_non_covered_earnings(earnings=self.person.earning_set)
 		else:
 			annual_non_covered_earnings = None
 
@@ -240,15 +231,15 @@ class Record(models.Model):
 		if self.max_delay_retirement_credit is None or not config.partial_update:
 			self.max_delay_retirement_credit = self.calculate_max_delay_retirement_credit(
 				drc_law=benefit_rules.drc_law, 
-				year_of_birth=self.content_object.year_of_birth, 
+				year_of_birth=self.person.year_of_birth, 
 				normal_retirement_age=self.normal_retirement_age)
 
 		if self.delay_retirement_credit is None or not config.partial_update:
 			self.delay_retirement_credit = self.calculate_delay_retirement_credit(
 				drc_law=benefit_rules.drc_law, 
-				year_of_birth=self.content_object.year_of_birth, 
+				year_of_birth=self.person.year_of_birth, 
 				normal_retirement_age=self.normal_retirement_age, 
-				retirement_age=self.content_object.retirement_age,
+				retirement_age=self.person.retirement_age,
 				max_delay_retirement_credit=self.max_delay_retirement_credit)
 
 		if self.max_early_retirement_reduction is None or not config.partial_update:
@@ -261,7 +252,7 @@ class Record(models.Model):
 			self.early_retirement_reduction = self.calculate_early_retirement_reduction(
 				primary_err_law=benefit_rules.primary_err_law, 
 				normal_retirement_age=self.normal_retirement_age, 
-				retirement_age=self.content_object.retirement_age, 
+				retirement_age=self.person.retirement_age, 
 				max_early_retirement_reduction=self.max_early_retirement_reduction)
 
 		if self.benefit is None or not config.partial_update:
@@ -300,7 +291,7 @@ class Record(models.Model):
 			return None
 		survivor_early_retirement_reduction = survivor_insurance_benefit_law.calculateSurvivorEarlyRetirementReductionFactor(
 			normal_retirement_age=normal_retirement_age,
-			retirement_age=self.content_object.retirement_age)
+			retirement_age=self.person.retirement_age)
 		return survivor_early_retirement_reduction
 
 	def calculate_survivor_insurance_benefit(self, survivor_insurance_benefit_law, primary_insurance_amount, deceased_spousal_primary_insurance_amount, 
@@ -324,7 +315,7 @@ class Record(models.Model):
 			self.survivor_early_retirement_reduction = self.calculate_survivor_early_retirement_reduction(
 				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,
 				normal_retirement_age=self.normal_retirement_age,
-				retirement_age=self.content_object.retirement_age)
+				retirement_age=self.person.retirement_age)
 			self.survivor_insurance_benefit = self.calculate_survivor_insurance_benefit(
 				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,
 				primary_insurance_amount=self.benefit, 

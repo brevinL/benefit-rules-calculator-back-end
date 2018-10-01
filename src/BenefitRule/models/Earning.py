@@ -1,7 +1,6 @@
 from django.db import models
 from .Money import Money
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from .Person import Person
 
 # https://secure.ssa.gov/poms.nsf/lnx/0101310010#c
 class Earning(models.Model):
@@ -31,11 +30,4 @@ class Earning(models.Model):
 
 	limit = {'model__in': ['person', 'respondent']}
 
-	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to=limit)
-	object_id = models.PositiveIntegerField()
-	content_object = GenericForeignKey('content_type', 'object_id')
-
-	class Meta:
-		unique_together = ('content_type', 'object_id')
-
-	# person = models.ForeignKey(Person, on_delete=models.CASCADE)
+	person = models.ForeignKey(Person, on_delete=models.CASCADE)

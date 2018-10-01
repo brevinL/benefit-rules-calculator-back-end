@@ -3,7 +3,6 @@ from BenefitRule.models import Relationship
 from BenefitRule.serializers import RelationshipSerializer
 # from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics
-from NEOandNDEBenefitCalculator.models import Respondent
 from django.db.models import Q
 
 # fix to able to post only

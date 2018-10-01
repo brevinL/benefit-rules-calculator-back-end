@@ -3,8 +3,7 @@ from django.db.models import Max
 from .Instruction import Task
 from .Utilities import percentage
 from .Earning import Earning
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
+from .Person import Person
 
 class DetailRecordConfig(object):
 	partial_update = False
@@ -18,12 +17,7 @@ class DetailRecordConfig(object):
 
 # todo: inherit from record for polymorphism
 class DetailRecord(models.Model):
-	limit = {'model__in': ['person', 'respondent']}
-	
-	content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to=limit)
-	object_id = models.PositiveIntegerField()
-	content_object = GenericForeignKey('content_type', 'object_id')
-
+	person = models.ForeignKey(Person, on_delete=models.CASCADE)
 	average_indexed_monthly_covered_earning_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, related_name="average_indexed_monthly_covered_earning_task") 
 	basic_primary_insurance_amount_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, related_name="basic_primary_insurance_amount_task") 
 	wep_primary_insurance_amount_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, related_name="wep_primary_insurance_amount_task") 
@@ -39,9 +33,6 @@ class DetailRecord(models.Model):
 	survivor_insurance_benefit_task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, related_name="survivor_insurance_benefit_task") 
 
 	config = DetailRecordConfig()
-
-	class Meta:
-		unique_together = ('content_type', 'object_id')
 
 	def calculate_annual_covered_earnings(self, earnings):
 		if earnings is None:
@@ -145,7 +136,7 @@ class DetailRecord(models.Model):
 		config = self.config if config is None else config
 
 		if config.covered_earning_available:
-			annual_covered_earnings = self.calculate_annual_covered_earnings(earnings=self.content_object.earnings)
+			annual_covered_earnings = self.calculate_annual_covered_earnings(earnings=self.person.earning_set)
 		else:
 			annual_covered_earnings = None
 
@@ -171,7 +162,7 @@ class DetailRecord(models.Model):
 				year_of_coverage=years_of_annual_covered_earnings)
 
 		if config.non_covered_earning_available:
-			annual_non_covered_earnings = self.calculate_annual_non_covered_earnings(earnings=self.content_object.earnings)
+			annual_non_covered_earnings = self.calculate_annual_non_covered_earnings(earnings=self.person.earning_set)
 		else:
 			annual_non_covered_earnings = None
 
@@ -201,7 +192,7 @@ class DetailRecord(models.Model):
 		if self.delay_retirement_credit_task is None or not config.partial_update:
 			self.delay_retirement_credit_task = self.create_delay_retirement_credit_task(
 				drc_law=benefit_rules.drc_law,
-				year_of_birth=self.content_object.year_of_birth, 
+				year_of_birth=self.person.year_of_birth, 
 				normal_retirement_age=beneficiary_record.normal_retirement_age, 
 				max_delay_retirement_credit=beneficiary_record.max_delay_retirement_credit,
 				delay_retirement_credit=beneficiary_record.delay_retirement_credit)
@@ -234,7 +225,9 @@ class DetailRecord(models.Model):
 		spousal_insurance_benefit_task.save()
 		return spousal_insurance_benefit_task
 		
-	def calculate_dependent_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record):
+	def calculate_dependent_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record, config=None):
+		config = self.config if config is None else config
+		
 		if self.spousal_insurance_benefit_task is None or not config.partial_update:
 			self.spousal_insurance_benefit_task = self.calculate_spousal_insurance_benefit(
 				spousal_insurance_benefit_law=benefit_rules.spousal_insurance_benefit_law,
@@ -249,7 +242,7 @@ class DetailRecord(models.Model):
 		if primary_insurance_amount is None or deceased_spousal_primary_insurance_amount is None or survivor_early_retirement_reduction_factor is None or \
 			spousal_delay_retirement_factor is None or government_pension_offset is None:
 			return None
-		survivor_insurance_benefit = survivor_insurance_benefit_law.calculate(
+		survivor_insurance_benefit = survivor_insurance_benefit_law.stepByStep(
 			primary_insurance_amount=primary_insurance_amount, 
 			deceased_spousal_primary_insurance_amount=deceased_spousal_primary_insurance_amount, 
 			survivor_early_retirement_reduction_factor=survivor_early_retirement_reduction_factor, 
@@ -258,7 +251,9 @@ class DetailRecord(models.Model):
 		survivor_insurance_benefit.save()
 		return survivor_insurance_benefit
 
-	def calculate_survivor_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record):
+	def calculate_survivor_benefits(self, benefit_rules, beneficiary_record, spousal_beneficiary_record, config=None):
+		config = self.config if config is None else config
+
 		if self.survivor_insurance_benefit_task is None or not config.partial_update:
 			self.survivor_insurance_benefit_task = self.calculate_survivor_insurance_benefit(
 				survivor_insurance_benefit_law=benefit_rules.survivor_insurance_benefit_law,

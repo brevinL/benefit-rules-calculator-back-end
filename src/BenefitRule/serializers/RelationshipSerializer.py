@@ -1,23 +1,20 @@
 from rest_framework import serializers
 from BenefitRule.models import Relationship, Person
-from NEOandNDEBenefitCalculator.models import Respondent
-
 from .PersonSerializer import PersonSerializer
-from NEOandNDEBenefitCalculator.serializers import RespondentSerializer
-from generic_relations.relations import GenericRelatedField
 
 class RelationshipSerializer(serializers.ModelSerializer):
-	content_object1 = GenericRelatedField({
-		Person: PersonSerializer(),
-		Respondent: RespondentSerializer(),
-	})
+	person1 = PersonSerializer()
+	person2 = PersonSerializer()
 
-	content_object2 = GenericRelatedField({
-		Person: PersonSerializer(),
-		Respondent: RespondentSerializer(),
-	})
+	def create(self, validated_data):
+		person1_data = validated_data.pop('person1')
+		person2_data = validated_data.pop('person2')
+
+		person1 = Person.objects.create(**person1_data)
+		person2 = Person.objects.create(**person2_data)
+		return Relationship.objects.create(
+			person1=person1, person2=person2, **validated_data)
 
 	class Meta:
 		model = Relationship
-		fields = ('id', 'object_id1', 'object_id2', 'content_object1', 'content_object2', 
-			'person1_role', 'person2_role', 'relationship_type', 'start_date', 'end_date')
+		fields = '__all__'

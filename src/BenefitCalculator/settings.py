@@ -39,8 +39,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'generic_relations',
-    'BenefitRule.apps.BenefitruleConfig',
-    'NEOandNDEBenefitCalculator.apps.NEOandNDEBenefitCalculatorConfig'
+    'BenefitRule.apps.BenefitruleConfig'
 ]
 
 MIDDLEWARE = [

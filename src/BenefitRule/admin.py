@@ -23,3 +23,5 @@ admin.site.register(BenefitRule)
 admin.site.register(Task)
 admin.site.register(Instruction)
 admin.site.register(Expression)
+
+admin.site.register(Question)

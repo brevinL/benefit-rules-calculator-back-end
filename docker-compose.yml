@@ -1,8 +1,29 @@
 version: '3'
 
 services:
+  mysql:
+    image: mysql:5.7.23
+    environment:
+       - "MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}"
+       - "MYSQL_USER=${MYSQL_USER}"
+       - "MYSQL_PASSWORD=${MYSQL_PASSWORD}"
+       - "MYSQL_DATABASE=BenefitCalculator"
+    networks:
+     - webnet
+    volumes:
+     - ./mysql/db-data:/var/lib/mysql
+  nginx:
+    image: nginx:1.15.2-alpine
+    ports:
+      - "8001:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - web
+    networks:
+      - webnet
   web:
-    image: neo-and-nde-benefit-calculator-back-end
+    image: benefit-rules-calculator-back-end
     depends_on:
       - mysql
     deploy:

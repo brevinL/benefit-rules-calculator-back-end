@@ -8,9 +8,9 @@ done
 
 >&2 echo "Database is up - continuing"
 
-<<<<<<< HEAD
 python manage.py makemigrations
 python manage.py migrate
 python populate_benefit_rules.py
+python populate_questions.py
 
 exec "$@"

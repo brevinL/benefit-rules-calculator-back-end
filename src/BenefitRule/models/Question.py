@@ -1,14 +1,15 @@
 from django.db import models
 
 class Question(models.Model):
-	WEP = 'WEP'
-	GPO = 'GPO'
+	# find a way to api the choices
+	WEP = 'windfall-elimination-provision'
+	GPO = 'government-pension-offset'
 	BENEFIT_RULE_CHOICES = (
 		(WEP, 'Windfall Elimination Pension'),
 		(GPO, 'Government Pension Offset'),
 	)
 	benefit_rule = models.CharField(
-		max_length=5,
+		max_length=120,
 		choices=BENEFIT_RULE_CHOICES,
 	)
 
@@ -25,6 +26,7 @@ class Question(models.Model):
 	)
 	key = models.TextField()
 	value = models.TextField(blank=True)
+	label = models.TextField()
 	required = models.BooleanField(default=True)
 	order = models.PositiveIntegerField()
 

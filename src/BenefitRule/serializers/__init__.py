@@ -5,3 +5,4 @@ from .PersonSerializer import *
 from .RecordSerializer import *
 from .RelationshipSerializer import *
 from .DetailRecordSerializer import *
+from .QuestionSerializer import *
